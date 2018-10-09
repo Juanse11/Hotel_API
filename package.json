@@ -9,7 +9,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "apikeygen": "^1.1.0",
     "body-parser": "^1.18.3",
+    "eslint": "^5.6.1",
     "express": "^4.16.3",
     "mongoose": "^5.2.14",
     "request": "^2.88.0"
