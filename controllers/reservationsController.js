@@ -1,13 +1,16 @@
 var Reservation = require("../models/reservationModel");
 var Hotel = require("../models/hotelModel");
-var availables = 0;
-exports.book = function(req,res,next){
+exports.book = function(req,res){
     var reservation = req.body;
+    console.log(reservation);
     Reservation.aggregate([
         
         {
         $match: {
             $and: [{
+                hotelID: reservation.hotelID
+            },
+                {
                 startDate: {
                     $lte: reservation.endDate,
                 },
@@ -23,8 +26,8 @@ exports.book = function(req,res,next){
                 $sum: "$rooms_booked"
             }
         }
-    }]).then(function (err, result) {
-
+    }],function (err, result) {
+            console.log(result);
             var occupied = result;
             console.log(occupied);
             if (occupied.length !== 0) {
