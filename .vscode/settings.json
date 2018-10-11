@@ -1,0 +1,8 @@
+{
+    "liveServer.settings.multiRootWorkspaceName": "Hotel_API",
+    "liveServer.settings.proxy": {
+        "enable": true,
+        "baseUri": "/",
+        "proxyUri": "http://localhost:3000"
+    }
+}

@@ -2,9 +2,8 @@ var Reservation = require("../models/reservationModel");
 var Hotel = require("../models/hotelModel");
 exports.book = function(req,res){
     var reservation = req.body;
-    console.log(reservation);
-    Reservation.aggregate([
-        
+
+    Reservation.aggregate([ 
         {
         $match: {
             $and: [{
@@ -26,24 +25,34 @@ exports.book = function(req,res){
                 $sum: "$rooms_booked"
             }
         }
-    }],function (err, result) {
-            console.log(result);
+    }])
+    .then(function (result) {
             var occupied = result;
-            console.log(occupied);
-            if (occupied.length !== 0) {
-                Hotel.findById(reservation.hotelID, function (err, hotel) {
-                    var availables = hotel.rooms - occupied[0].total;
-                    console.log("availables: " + availables);
+            var availables;
+            
+                Hotel.findById(reservation.hotelID)
+                .then(function (hotel) {
+                    
+                    if (occupied.length !== 0) {
+                        availables = hotel.rooms - occupied[0].total;
+                    } else {
+                        availables = hotel.rooms;
+                    }
+
                     if (availables >= reservation.rooms_booked) {
-                        Reservation.create(reservation, function (err, result) {
-                            res.json({ message: "Your reservation was succesful!", reservationID: result._id });
+                        Reservation.create(reservation)
+                        .then(function (reservation) {
+                            res.json({ message: "Your reservation was succesful!", reservationID: reservation._id });
+                        })
+                        .catch(function (error) {
+                            res.json(error);
                         });
                     } else {
                         res.json({ message: "ERROR: There are not enough rooms available." });
                     }
 
                 });
-            }
+            
         });  
 };
 

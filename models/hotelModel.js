@@ -11,8 +11,8 @@ var hotelSchema = new Schema({
     type: { type: String, required: true },
     rooms: { type: Number, required: true },
     size: String,
-    latitude: Number,
-    longitude: Number
+    coordinates:[Number]
+    
 }, {
         versionKey: false
     });

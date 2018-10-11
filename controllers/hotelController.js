@@ -1,34 +1,56 @@
 var Hotel = require("../models/hotelModel");
 
-exports.findAll = function (req, res, next) {
-
-    var query = req.query;
-    var range = query.range;
-    if (range) {
-        var maxlat = Number(query.lat) + Number(range);
-        var minlat = Number(query.lat) - Number(range);
-        var maxlon = Number(query.lon) + Number(range);
-        var minlon = Number(query.lon) - Number(range);
-
-        Hotel.find({ latitude: { $gte: minlat, $lte: maxlat }, longitude: { $gte: minlon, $lte: maxlon } }, function (err, result) {
+exports.findByRange = function (req, res,next) {
+    if (req.query.range) {
+        var query = req.query;
+        var longitude = Number(query.longitude);
+        var latitude = Number(query.latitude);
+        delete query.longitude;
+        delete query.latitude;
+        Hotel.find(
+            {
+                location:
+                {
+                    $near:
+                    {
+                        $geometry: { type: "Point", coordinates: [longitude, latitude] },
+                        $maxDistance: Number(query.range) * 1000
+                    }
+                }
+            }
+        ).then(function (result) {
             res.json({ length: result.length, records: result });
         });
-    } else {
+    }else{
         next();
     }
+    
+
+
 };
 
-exports.findByRange = function (req, res) {
+exports.findAll = function (req, res) {
     var query = req.query;
     Hotel.find(query, function (err, result) {
         res.json({ length: result.length, records: result });
     });
 };
 
+function getHotelSize(rooms){
+    if (rooms<=50) {
+        return "small";
+    }else if(rooms >= 51 & rooms <=100){
+        return "medium";
+    }else{
+        return "large";
+    }
+}
+
 exports.create = function (req, res) {
     var hotel = req.body;
     if (hotel.apiKey) {
         delete hotel.apiKey;
+        hotel.size = getHotelSize(hotel.rooms);
         Hotel.create(hotel, function (err, hotelCreated) {
             if (err) {
                 res.json(err);
