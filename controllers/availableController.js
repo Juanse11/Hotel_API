@@ -32,7 +32,7 @@ var query = req.query;
                 { $and: [{ 
                     "reservation.startDate": { "$exists": false } 
                     }, 
-                    { "state": "KERALA" }] 
+                    { "state": query.state }] 
                 }]
             }
         }, {
@@ -49,7 +49,7 @@ var query = req.query;
         } 
     ])
     .then(function (result) {
-
+        result[0].length = result[0].availableHotels.length;
         result[0].availableHotels.forEach((hotel,index) => {
                  var availables = hotel.totalRooms - hotel.availableRooms;
                  hotel.availableRooms = availables;
@@ -57,7 +57,7 @@ var query = req.query;
                      result.splice(index,1);
                  }
              });
-             res.json({results: result});
+        res.json({ length: result[0].length, results: result});
 
     });
 };
