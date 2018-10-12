@@ -24,9 +24,6 @@ exports.findByRange = function (req, res,next) {
     }else{
         next();
     }
-    
-
-
 };
 
 exports.findAll = function (req, res) {
